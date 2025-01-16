@@ -7,7 +7,7 @@ export interface IRecipe {
     image: string
     price: number
     qty: string
-    weight: number
+    weight: string
     categoryID: string
 }
 

@@ -1,83 +1,86 @@
 import { Button, Grid2, Paper, TextField, Typography } from "@mui/material"
-import React, { ChangeEvent, useCallback, useState } from "react"
+import React, { ChangeEvent, MouseEvent, useCallback, useMemo, useState } from "react"
 import { ICategory } from "../types"
 import useCategories from "../hooks/useCategories";
 import CategoryList from "../components/Category/CategoryList";
+import CategoryForm from "../components/Category/CategoryForm";
 
-const defaultRecord={id:'',name:'',items:[]}
+const defaultRecord = { id: '', name: '', items: [] }
+
 const Categories: React.FC = () => {
 
-   const [curCategory, setCurCategory] = useState<ICategory>({...defaultRecord});
-   const { add, delete: remove, update,items } = useCategories();
+   const [curCategory, setCurCategory] = useState<ICategory>({ ...defaultRecord });
+   const { add, delete: remove, update, items } = useCategories();
+   const [show, setShow] = useState(false);
+   const [search, setSearch] = useState('');
+   
+   const onClickAdd = useCallback((e: MouseEvent) => {
 
-   const handleNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      setShow(true)
 
-      setCurCategory((data) => {
-
-         if (!data) {
-
-            return {
-               id: "",
-               name: e.target.value,
-            }
-
-         }
-
-         return { ...data, name: e.target.value }
-
-      })
    }, [])
 
+   const onClose = useCallback(() => {
 
+      setShow(false)
 
-   const handleAddClick = useCallback(() => {
+   }, [])
 
-      if (curCategory) {
+   const onSave = useCallback((data: ICategory) => {
 
-         if (curCategory?.id) {
-            update({ ...curCategory })
-         } else {
-            add({ ...curCategory })
-         }
-         setCurCategory({...defaultRecord})
+      setShow(true);
+      if (data?.id) {
+
+         update({ ...data })
+
+      } else {
+
+         add({ ...data })
+
       }
 
-
+      setCurCategory({ ...defaultRecord });
+      setShow(false)
 
    }, [curCategory, add, update])
 
-   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+   const onEdit = useCallback((data: ICategory) => {
 
-      if (e.key === 'Enter') {
+      setCurCategory(data);
 
-         handleAddClick();
-         
-      }
+   }, [Categories]);
 
-   }, [handleAddClick]);
+   const handleSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
 
-   const onEdit=useCallback((data:ICategory)=>{
+      const { value } = e.target
+      setSearch(value);
 
-      setCurCategory(data)
+   }, [])
 
-   },[Categories])
+   const data = useMemo(() => {
+
+      if (!search) return items
+
+      return items.filter(d => d.name.includes(search));
+
+   }, [search, items])
 
    return <>
+      {show && <CategoryForm onSave={onSave} onClose={onClose} category={curCategory} />}
       <Paper elevation={12} style={{ marginTop: "5%", marginLeft: '5%', padding: '25px', width: "90%", height: '70vh' }}>
-         <Typography variant="h4" fontSize={24} >Manage Categories</Typography>
          <Grid2 container spacing={5} padding={5}>
-            <Grid2 size={10}>
-               <TextField label={"Category Name"} value={curCategory.name} onKeyDown={handleKeyDown} onChange={handleNameChange} size="small" fullWidth
-                  error={curCategory?.name.length === 0}
-                  helperText={curCategory?.name.length === 0 ? "Name is required" : ""}
-               />
+            <Grid2 size={6}>
+               <Typography variant="h4" fontSize={24} >Manage Categories</Typography>
+            </Grid2>
+            <Grid2 size={4}>
+               <TextField size="small" fullWidth onChange={handleSearchChange} label="Search" />
             </Grid2>
             <Grid2 size={2}>
-               <Button variant='contained' color="primary" onClick={handleAddClick}>{curCategory.id?"Edit":"Add"}</Button>
+               <Button variant='contained' color="primary" onClick={onClickAdd}>Add</Button>
             </Grid2>
          </Grid2>
-         <Typography variant="h4" fontSize={24} >Categories</Typography>
-         <CategoryList items={[...items].reverse()} onEdit={onEdit} onDelete={remove}/>
+         <CategoryList items={[...data].reverse()} onEdit={onEdit} onDelete={remove} />
       </Paper>
    </>
 

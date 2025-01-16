@@ -7,6 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
+import { Typography } from '@mui/material';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -19,18 +20,6 @@ const MenuProps = {
   },
 };
 
-const names = [
-  'Oliver Hansen',
-  'Van Henry',
-  'April Tucker',
-  'Ralph Hubbard',
-  'Omar Alexander',
-  'Carlos Abbott',
-  'Miriam Wagner',
-  'Bradley Wilkerson',
-  'Virginia Andrews',
-  'Kelly Snyder',
-];
 
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
   return {
@@ -42,54 +31,61 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
 interface IMultiSelect {
   items: string[],
   label: string,
-  id?: string
+  id?: string,
+  onChange?: (data: string[]) => void
+  error?: boolean,
+  helperText?: string
+  preSelected:string[]
 }
 
-const MultiSelect: React.FC<IMultiSelect> = ({ items, label, id }) => {
+const MultiSelect: React.FC<IMultiSelect> = ({ items, label, id, onChange,error,helperText,preSelected }) => {
   const theme = useTheme();
-  const [personName, setPersonName] = React.useState<string[]>([]);
+  const [value, setValue] = React.useState<string[]>(preSelected);
 
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
-    const {
-      target: { value },
-    } = event;
-    setPersonName(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value,
-    );
-  };
+  const handleChange = React.useCallback((event: SelectChangeEvent<typeof value>) => {
+
+    const { target: { value }, } = event;
+    let selectedItemsId = typeof value === 'string' ? value.split(',') : value;
+
+    setValue(selectedItemsId);
+
+    typeof onChange === 'function' && onChange(selectedItemsId);
+  }, [onChange, items]);
 
   return (
     <div>
-      <FormControl sx={{ m: 1, width: 300 }}>
+      <FormControl sx={{ m: 1, width: 300 }} error={error}>
         <InputLabel id={"label-id" + id}>{label}</InputLabel>
         <Select
+          error={error}
+          fullWidth={true}
           size='small'
           labelId={"label-id" + id}
           id={id}
           multiple
-          value={personName}
           onChange={handleChange}
+          value={value}
           input={<OutlinedInput id={id + "-intput"} label={label} />}
           renderValue={(selected) => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
+              {selected.map((value, index) => (
+                <Chip key={value + index} label={value} />
               ))}
             </Box>
           )}
           MenuProps={MenuProps}
         >
-          {items.map((name) => (
+          {items.map((item, index) => (
             <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}
+              key={item + index}
+              value={item}
+              style={getStyles(item, value, theme)}
             >
-              {name}
+              {item}
             </MenuItem>
           ))}
         </Select>
+        <Typography variant="caption" color="error">{helperText}</Typography>
       </FormControl>
     </div>
   );

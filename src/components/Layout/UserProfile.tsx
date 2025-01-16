@@ -1,5 +1,6 @@
 import { Box, Tooltip, IconButton, Avatar, Menu, MenuItem, Typography } from "@mui/material"
 import { MouseEvent, useCallback, useState } from "react";
+import useAuth from "../../hooks/useAuth";
 
 
 interface IUserProfile {
@@ -9,6 +10,7 @@ interface IUserProfile {
 const UserProfile: React.FC<IUserProfile> = ({ userProfilePic }) => {
 
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+    const {logout}=useAuth();
 
     const handleOpenUserMenu = useCallback((event: MouseEvent<HTMLElement>) => {
 
@@ -24,7 +26,7 @@ const UserProfile: React.FC<IUserProfile> = ({ userProfilePic }) => {
 
     return <>
         <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
+            <Tooltip title="User profile">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                     <Avatar alt="user profile" src={userProfilePic} />
                 </IconButton>
@@ -45,7 +47,7 @@ const UserProfile: React.FC<IUserProfile> = ({ userProfilePic }) => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
             >
-                <MenuItem onClick={handleCloseUserMenu}>
+                <MenuItem onClick={logout}>
                     <Typography sx={{ textAlign: 'center' }}>Logout </Typography>
                 </MenuItem>
 

@@ -3,24 +3,7 @@ import { ICategory, CategoryState } from "../types";
 
 const initialState: CategoryState = {
     isLoaded: false,
-    categories: [
-        {
-            id: "1",
-            name: "Appetizers",
-            items: ["Spring Rolls", "Garlic Bread", "Stuffed Mushrooms"]
-        },
-        {
-            id: "2",
-            name: "Main Course",
-            items: ["Grilled Chicken", "Pasta Carbonara", "Beef Steak"]
-        },
-        {
-            id: "3",
-            name: "Desserts",
-            items: ["Cheesecake", "Brownie", "Ice Cream"]
-        }
-
-    ],
+    categories: [],
 };
 
 const CategorySlice = createSlice({

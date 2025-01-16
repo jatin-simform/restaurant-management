@@ -8,7 +8,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import useCategories from '../../hooks/useCategories';
 
 interface ICategoryListProps {
     items: ICategory[],
@@ -41,9 +40,6 @@ const CategoryListItem: React.FC<ICategoryListItemProps> = ({ item, onDelete, on
             <TableCell component="th" scope="row">
                 {item.name}
             </TableCell>
-            <TableCell component="th" scope="row">
-                {item.items.length}
-            </TableCell>
             <TableCell align="right">
                 <Button onClick={handleEdit}>Edit</Button>
                 <Button onClick={handleDelete} color='error'>Delete</Button>
@@ -62,7 +58,6 @@ const CategoryList: React.FC<ICategoryListProps> = ({ items, onEdit,onDelete }) 
                 <TableHead>
                     <TableRow>
                         <TableCell>Name</TableCell>
-                        <TableCell>Recipe Count</TableCell>
                         <TableCell align="right">Actions</TableCell>
                     </TableRow>
                 </TableHead>

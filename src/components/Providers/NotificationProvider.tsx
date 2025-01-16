@@ -1,17 +1,6 @@
-import { createContext, useCallback, useContext } from 'react';
-import { SnackbarProvider, useSnackbar } from 'notistack';
-
-interface INotificaitonContext {
-    notifySuccess: (msg: string) => void,
-    notifyError: (msg: string) => void,
-}
-
-const notificationContext = createContext<INotificaitonContext>({
-    notifyError: () => { },
-    notifySuccess: () => { }
-})
-
-export const useNotification=()=>useContext(notificationContext)
+import { useCallback } from 'react';
+import { useSnackbar } from 'notistack';
+import notificaitonContext from '../../contexts/notificationContext'
 
 const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
@@ -19,24 +8,24 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const { enqueueSnackbar } = useSnackbar();
 
 
-    const notifySuccess = useCallback((message: String) => {
+    const notifySuccess = useCallback((message: string) => {
 
         enqueueSnackbar(message, { variant: 'success' });
 
-    }, [])
+    }, [enqueueSnackbar])
 
-    const notifyError = useCallback((message: String) => {
+    const notifyError = useCallback((message: string) => {
+
+        console.log("its called", message)
 
         enqueueSnackbar(message, { variant: 'error' });
 
-    }, [])
+    }, [enqueueSnackbar])
 
     return <>
-        <SnackbarProvider maxSnack={50}>
-            <notificationContext.Provider value={{ notifyError, notifySuccess }}>
-                {children}
-            </notificationContext.Provider>
-        </SnackbarProvider>
+        <notificaitonContext.Provider value={{ notifyError, notifySuccess }}>
+            {children}
+        </notificaitonContext.Provider>
     </>
 
 }

@@ -5,8 +5,9 @@ import { useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { ICategory } from '../../types';
 import { useCallback, useEffect, useState } from 'react';
-import { useNotification } from './NotificationProvider';
 import { addCategory, deleteCategory, setCategories, updateCategory } from '../../store/CategorySlice';
+import API from '../../api';
+import useNotification from '../../hooks/useNotification';
 
 
 const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -17,6 +18,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
     const { isLoaded, categories: items } = useSelector((state: RootState) => state.category);
 
     const { notifyError } = useNotification();
+    
     //this is to load the initial data from the api
     useEffect(() => {
 
@@ -24,8 +26,12 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
             try {
                 setIsLoading(true);
-                //todo make API call
-                dispatch(setCategories([]));
+                const res = await API.categories();
+                if (res.status !== 200) {
+                    throw new Error("Failed to load categories")
+                }
+
+                dispatch(setCategories(res.data || []));
 
             } catch (e: unknown) {
 
@@ -45,11 +51,13 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
     }, [isLoaded, dispatch])
 
     const add = useCallback(async (data: ICategory) => {
+        let newCategory = { ...data, id: Math.random() + "" }
 
         try {
             setIsLoading(true);
-            //todo make API call
-            dispatch(addCategory({ ...data, id: Math.random() + "" }));
+            const res = await API.addCategory(newCategory);
+            if (res.status !== 201) throw new Error("Failed to create category")
+            dispatch(addCategory(newCategory));
 
         } catch (e: unknown) {
 
@@ -61,13 +69,16 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
         }
 
+        return newCategory.id;
+
     }, []);
 
     const _delete = useCallback(async (id: string) => {
 
         try {
             setIsLoading(true);
-            //todo make API call
+            const res = await API.deleteCategory(id);
+            if (res.status !== 200) throw new Error("Failed to delete category")
             dispatch(deleteCategory(id));
 
         } catch (e: unknown) {
@@ -80,6 +91,8 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
         }
 
+        return id;
+
 
     }, []);
 
@@ -87,7 +100,8 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
         try {
             setIsLoading(true);
-            //todo make API call
+            const res = await API.updateCategory(data);
+            if (res.status !== 200) throw new Error("Failed to update category!")
             dispatch(updateCategory(data))
 
         } catch (e: unknown) {
@@ -99,6 +113,8 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
             setIsLoading(false);
 
         }
+
+        return data.id;
 
     }, [dispatch]);
 

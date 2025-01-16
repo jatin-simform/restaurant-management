@@ -19,7 +19,6 @@ const Categories: React.FC = () => {
             return {
                id: "",
                name: e.target.value,
-               items: []
             }
 
          }
@@ -74,7 +73,7 @@ const Categories: React.FC = () => {
                />
             </Grid2>
             <Grid2 size={2}>
-               <Button variant='contained' color="primary" onClick={handleAddClick}>Add</Button>
+               <Button variant='contained' color="primary" onClick={handleAddClick}>{curCategory.id?"Edit":"Add"}</Button>
             </Grid2>
          </Grid2>
          <Typography variant="h4" fontSize={24} >Categories</Typography>

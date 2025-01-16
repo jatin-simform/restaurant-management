@@ -14,7 +14,6 @@ export interface IRecipe {
 export interface ICategory {
     id: string,
     name: string
-    items: string[],//ids of selected recipies
 }
 
 export interface IMenu {

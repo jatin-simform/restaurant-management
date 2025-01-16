@@ -8,6 +8,7 @@ import HeaderMenu, { IUrl } from './HeaderMenu';
 import PageTitle from './PageTitle';
 import useScreenRatio from '../../hooks/useScreenRatio';
 import UserProfile from './UserProfile';
+import useAuth from '../../hooks/useAuth';
 
 interface IHeaderProps {
   title: string,
@@ -19,6 +20,7 @@ interface IHeaderProps {
 const Header: React.FC<IHeaderProps> = ({ icon, links, title, user }) => {
 
   const isMobileView = useScreenRatio();
+  const { data } = useAuth();
 
   return (
     <AppBar position="static">
@@ -32,7 +34,7 @@ const Header: React.FC<IHeaderProps> = ({ icon, links, title, user }) => {
           {
             isMobileView && <HeaderMenu links={links} isMobileView={isMobileView} />
           }
-          <UserProfile userProfilePic='/profilepic.webp'/>
+          <UserProfile userProfilePic={(data.authUser?.image || "")} />
         </Toolbar>
       </Container>
     </AppBar>

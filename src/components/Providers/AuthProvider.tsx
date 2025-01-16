@@ -1,85 +1,87 @@
-import { useCallback, useReducer } from "react"
-import authContext, { IAuthData } from "../../contexts/authContext"
-import authApi, { AuthPayload } from "../../api/authApi"
-
-const authData: IAuthData = {
-    isLoggedIn: false,
-    isLoading: false
-}
-
-type AuthActionType = "LOGIN" | "LOGOUT" | "SETLOADING"
-
-type AuthAction = {
-    type: AuthActionType,
-    payload: Partial<IAuthData>
-}
-
-
-const authReducers = (state: IAuthData, action: AuthAction) => {
-
-    switch (action.type) {
-        case "LOGIN":
-            state.isLoggedIn = true;
-            break
-        case "LOGOUT":
-            state.isLoggedIn = false;
-            break
-        case "SETLOADING":
-            state.isLoading = Boolean(action.payload.isLoading);
-            break
-    }
-    return state;
-
-}
+import { useCallback, useEffect, useReducer, useState } from "react"
+import authContext, { IAuthData, IAuthUser } from "../../contexts/authContext"
+import authApi, { AuthPayload } from "../../api"
+import useNotification from "../../hooks/useNotification"
+import { useNavigate } from "react-router"
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
 
-    const [state, dispatch] = useReducer(authReducers, authData)
+    const [isLoading,setLoading]=useState(true);
+    const [authUser,setAuthUser]=useState<IAuthUser|undefined>();
+    const [isLoggedIn,setLoggedIn]=useState(false);
+    const { notifyError } = useNotification();
+    const navigate = useNavigate();
 
+    useEffect(() => {
+
+        if (!localStorage) {
+
+            notifyError("Something went wrong!");
+            console.error(new Error("Local storage not found"));
+            return
+            
+        }
+        let authData = localStorage.getItem("AuthData");
+
+        if (authData) {
+            const parsedAuthData = JSON.parse(authData) as IAuthUser;
+           
+            if (parsedAuthData) {
+                setLoggedIn(true);
+                setAuthUser(parsedAuthData);
+            }
+
+        }else{
+            throw new Error("Something went wrong")
+        }
+
+        setLoading(false);
+
+    }, [navigate]);
 
     const logout = useCallback(() => {
 
-        dispatch({ type: 'LOGOUT', payload: { isLoggedIn: false } });
+        setLoggedIn(false)
+        localStorage.setItem("AuthData", "null")
+        navigate("/login")
 
-    }, [dispatch])
-
+    }, [ navigate])
 
     const login = useCallback((data: AuthPayload) => {
-
-
         const fn = async () => {
 
-            dispatch({ type: 'SETLOADING', payload: { isLoading: true } });
+            setLoading(true)
 
             try {
                 const res = await authApi.login(data);
+                if (res.status !== 200) throw new Error("Login failed")
 
-                console.log("res", res);
+                localStorage.setItem("AuthData", JSON.stringify(res.data));
+                setLoggedIn(true);
+                setAuthUser(res.data);
+                setLoading(false);
+                navigate("/")
 
-                if (res.status === 200) {
-
-                    dispatch({ type: 'LOGIN', payload: { isLoggedIn: true } });
-                    //todo set auth user if 
-                }
 
             } catch (e: unknown) {
-                //todo notifiy the user for login fail
+                notifyError("Login Failed!")
                 console.log("Error", e)
             } finally {
-
-                dispatch({ type: 'SETLOADING', payload: { isLoading: false } });
+                setLoading(false)
 
             }
-
 
         }
 
         fn();
 
+    }, [ notifyError, navigate])
 
-    }, [dispatch])
-
-    return <authContext.Provider value={{ data: state, login, logout }}>{props.children}</authContext.Provider>
+    const content = isLoading ? <>Please wait...</> : props.children
+    
+    return <authContext.Provider value={{ data: {isLoading,isLoggedIn,authUser}, login, logout }}>
+        {content}
+    </authContext.Provider>
 
 }
 

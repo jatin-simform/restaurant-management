@@ -24,11 +24,9 @@ const RecipeList: React.FC = () => {
         },
         { field: 'price', headerName: 'Price ($)', width: 120 },
         { field: 'qty', headerName: 'Quantity', width: 120 },
-        { field: 'weight', headerName: 'Weight (g)', width: 120 },
         {
             field: 'categoryID', headerName: 'Category', width: 150, renderCell: (params: GridRenderCellParams<IRecipe>) => {
                 const res = categories.find(t => t.id === params.row.categoryID);
-                console.log("params", params.row, res)
                 if (res) {
                     return <>{res.name}</>;
                 }
@@ -73,12 +71,22 @@ const RecipeList: React.FC = () => {
                     <Button variant='contained' color="primary" onClick={handleAddClick}>Add</Button>
                 </Grid2>
                 <Grid2 size={12} >
-                    <DataGrid
-                        rows={recipes}
-                        columns={columns}
-                        pageSizeOptions={[5, 10, 20]} // Define page size options
-                    />
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            maxHeight: 700,
+                            minHeight: 200,
+                        }}
+                    >
+                        <DataGrid
+                            rows={recipes}
+                            columns={columns}
+                            pageSizeOptions={[5, 10, 20]} // Define page size options
+                        />
+                    </div>
                 </Grid2>
+
             </Grid2>
         </Paper>
     </>

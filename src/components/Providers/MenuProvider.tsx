@@ -5,16 +5,18 @@ import { useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { IMenu } from '../../types';
 import { useCallback, useEffect, useState } from 'react';
-import { useNotification } from './NotificationProvider';
 import { addMenu, deleteMenu, setMenu, updateMenu } from '../../store/MenuSlice';
+import { useNavigate } from 'react-router';
+import API from '../../api';
+import useNotification from '../../hooks/useNotification';
 
 
 const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) => {
 
     const [isLoading, setIsLoading] = useState(false);
-
-
     const dispatch = useDispatch();
+
+    const navigate = useNavigate();
 
     const { isLoaded, menu: items } = useSelector((state: RootState) => state.menu);
     const { notifyError } = useNotification();
@@ -25,8 +27,10 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
 
             try {
                 setIsLoading(true);
+                const res = await API.menus();
+                if (res.status !== 200) throw new Error("Failed to load menus")
                 //todo make API call
-                dispatch(setMenu([]));
+                dispatch(setMenu(res.data || []));
 
             } catch (e: unknown) {
 
@@ -46,10 +50,16 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
     }, [isLoaded, dispatch])
 
     const add = useCallback(async (data: IMenu) => {
+        const id = Math.random().toString(36);
+        const newMenu = { ...data, id }
         try {
             setIsLoading(true);
-            //todo make API call
-            dispatch(addMenu(data));
+            const res = await API.addMenu(newMenu);
+
+            if (res.status !== 201) throw new Error("Failed to add new menu");
+
+            dispatch(addMenu(newMenu));
+            navigate(`/menus/${id}`);
 
         } catch (e: unknown) {
 
@@ -61,12 +71,18 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
 
         }
 
-    }, []);
+        return id;
+
+    }, [navigate]);
 
     const _delete = useCallback(async (id: string) => {
 
         try {
             setIsLoading(true);
+            const res = await API.deleteMenu(id);
+            if (res.status !== 200) {
+                throw new Error("Failed to delete menu");
+            }
             //todo make API call
             dispatch(deleteMenu(id));
 
@@ -80,6 +96,8 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
 
         }
 
+        return id;
+
 
     }, []);
 
@@ -87,8 +105,10 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
 
         try {
             setIsLoading(true);
-            //todo make API call
+            const res=await API.updateMenu(data);
+            if(res.status!==200)throw new Error("Failed to update menu");
             dispatch(updateMenu(data))
+            navigate(`/menus/`);
 
         } catch (e: unknown) {
 
@@ -100,7 +120,9 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
 
         }
 
-    }, [dispatch]);
+        return data.id;
+
+    }, [dispatch,navigate]);
 
 
     return <menuContext.Provider value={{ isLoaded, items, add, delete: _delete, update, isLoading }}>

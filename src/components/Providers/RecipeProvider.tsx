@@ -5,8 +5,9 @@ import { useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { IRecipe } from '../../types';
 import { useCallback, useEffect, useState } from 'react';
-import { useNotification } from './NotificationProvider';
 import { addRecipe, deleteRecipe, setRecipes, updateRecipe } from '../../store/RecipeSlice';
+import API from '../../api';
+import useNotification from '../../hooks/useNotification';
 
 
 const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -17,7 +18,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
     const { isLoaded, recipes: items } = useSelector((state: RootState) => state.recipe);
 
-    const { notifyError,notifySuccess } = useNotification();
+    const { notifyError, notifySuccess } = useNotification();
 
     //this is to load the initial data from the api
     useEffect(() => {
@@ -26,9 +27,11 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
             try {
                 setIsLoading(true);
-                //todo make API call
-                dispatch(setRecipes([]));
+                const res = await API.recipes();
 
+                if (res.status !== 200) throw new Error("Failed to load recipes")
+
+                dispatch(setRecipes(res.data));
 
             } catch (e: unknown) {
 
@@ -52,7 +55,10 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
         try {
 
             setIsLoading(true);
-            dispatch(addRecipe({ ...data, id: id }));
+            const newData = { ...data, id: id }
+            const res = await API.addRecipe(newData);
+            if (res.status !== 201) throw new Error("Failed to add new Recipe")
+            dispatch(addRecipe(newData));
             notifySuccess("Record Saved Successfully")
 
         } catch (e: unknown) {
@@ -68,13 +74,18 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
         return id;
 
 
-    }, [notifySuccess,notifyError]);
+    }, [notifySuccess, notifyError]);
 
     const _delete = useCallback(async (id: string) => {
 
         try {
             setIsLoading(true);
-            //todo make API call
+            const res = await API.deleteRecipe(id);
+
+            if (res.status !== 200) {
+                throw new Error("Failed to delete Recipe!")
+            }
+
             dispatch(deleteRecipe(id));
 
         } catch (e: unknown) {
@@ -96,9 +107,11 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
         try {
 
             setIsLoading(true);
+            const res = await API.updateRecipe(data);
+            if (res.status !== 200) throw new Error("Failed to update Recipe!")
 
             dispatch(updateRecipe(data));
-            
+
             notifySuccess("Record updated sccessfully");
 
         } catch (e: unknown) {

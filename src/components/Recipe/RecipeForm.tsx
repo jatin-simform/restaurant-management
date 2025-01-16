@@ -20,9 +20,10 @@ const validateRecipe = (recipe: IRecipe) => {
         errors.description = 'Description is required';
     }
 
-    if (!recipe.image) {
-        errors.image = 'Image is required';
-    }
+    if (!recipe.id)
+        if (!recipe.image) {
+            errors.image = 'Image is required';
+        }
 
     if (recipe.price <= 0) {
         errors.price = 'Price must be greater than zero';
@@ -62,9 +63,8 @@ const RecipeForm: React.FC = ({ }) => {
     const [formData, setFormData] = useState<IRecipe>({ ...defultState });
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const { add, update, items } = useRecipes();
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
-    console.log("formDAta",formData)
 
     const { id } = useParams<{ id: string }>();
 
@@ -110,7 +110,6 @@ const RecipeForm: React.FC = ({ }) => {
 
     const handleSubmit = useCallback((e: React.FormEvent) => {
         e.preventDefault();
-
         const fn = async () => {
 
             const res = validateRecipe(formData);
@@ -125,19 +124,18 @@ const RecipeForm: React.FC = ({ }) => {
             if (formData.id) {
 
                 await update({ ...formData })
-
+                navigate("/recipes")
             } else {
 
-                let newId=await add({ ...formData });
-                console.log("new ID",newId+"--Q")
-                navigate("/recipes/"+newId)
+                let newId = await add({ ...formData });
+                navigate("/recipes/" + newId)
             }
 
         }
 
         fn();
 
-    }, [formData,navigate]);
+    }, [formData, navigate]);
     const handleCategoryChange = useCallback((e: SelectChangeEvent) => {
         const { name, value } = e.target;
         setFormData({
@@ -150,7 +148,7 @@ const RecipeForm: React.FC = ({ }) => {
         <Paper elevation={12} style={{ display: 'flex', flexDirection: 'row', marginTop: "5%", marginLeft: '5%', padding: '25px', width: "90%", height: '70vh' }}>
             <Grid2 container spacing={2} padding={5} width={"50%"}>
                 <Grid2 size={10}>
-                    <Typography variant="h4" fontSize={24} >{formData.id==='' ? "Add " : "Edit "} Recipes</Typography>
+                    <Typography variant="h4" fontSize={24} >{formData.id === '' ? "Add " : "Edit "} Recipes</Typography>
                 </Grid2>
                 <Grid2 size={6}>
                     <TextField

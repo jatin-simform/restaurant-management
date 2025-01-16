@@ -5,22 +5,32 @@ import RoutesProvider from "./components/Providers/RoutesProvider"
 import { store } from "./store"
 import CategoryProvider from "./components/Providers/CategoryProvider"
 import RecipeProvider from "./components/Providers/RecipeProvider"
+import { SnackbarProvider } from "notistack"
+import { BrowserRouter, Route, Routes } from "react-router"
 
 const App: React.FC = () => {
 
   return (
     <>
-      <AuthProvider>
-        <Provider store={store}>
+      <Provider store={store}>
+        <SnackbarProvider maxSnack={50}>
           <NotificationProvider>
-            <CategoryProvider>
-              <RecipeProvider>
-                <RoutesProvider />
-              </RecipeProvider>
-            </CategoryProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="*" element={<>
+                  <AuthProvider>
+                    <CategoryProvider>
+                      <RecipeProvider>
+                        <RoutesProvider />
+                      </RecipeProvider>
+                    </CategoryProvider>
+                  </AuthProvider>
+                </>} />
+              </Routes>
+            </BrowserRouter>
           </NotificationProvider>
-        </Provider>
-      </AuthProvider>
+        </SnackbarProvider>
+      </Provider>
     </>
   )
 }

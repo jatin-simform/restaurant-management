@@ -1,14 +1,19 @@
 import { Button, Chip, Grid2, LinearProgress, Paper, Typography } from "@mui/material";
 import useMenu from "../../hooks/useMenu";
 import { useCallback, useMemo } from "react";
-import {  IMenu } from "../../types";
+import { ICategory, IMenu } from "../../types";
 import { useNavigate } from "react-router";
+import { DataGrid } from "@mui/x-data-grid";
+import useCategories from "../../hooks/useCategories";
 
 
 
 const MenuList: React.FC = () => {
 
     const { delete: _remove, isLoaded, isLoading, items: rows, update } = useMenu();
+
+    const { items: categories } = useCategories();
+
     const navigate = useNavigate();
 
     const handleAddClick = useCallback(() => {
@@ -32,8 +37,8 @@ const MenuList: React.FC = () => {
         }
 
         return <>
-            <Button onClick={onClickEdit} >Edit</Button>
-            <Button onClick={onClickDelete}>Delete</Button>
+            <Button onClick={onClickEdit} color="primary" >Edit</Button>
+            <Button onClick={onClickDelete} color="error">Delete</Button>
         </>
 
     }, [navigate])
@@ -41,11 +46,17 @@ const MenuList: React.FC = () => {
     const columns = useMemo(() => {
 
         return [
-            { field: 'id', headerName: 'ID', width: 150 },
-            { field: 'name', headerName: 'Name', width: 300 },
+            { field: 'name', headerName: 'Name', width: 250 },
             {
-                field: 'categoryCount', headerName: 'Category Count', width: 780, renderCell: (params: { row: IMenu }) => {
-                    return params.row.categories.map((category) => {
+                field: 'categories', headerName: 'Categories', width: 300, renderCell: (params: { row: IMenu }) => {
+
+                    const chipsItems = categories.filter((cat) => {
+
+                        return params.row.categories.includes(cat.id);
+
+                    })
+
+                    return chipsItems.map((category: ICategory) => {
                         return <Chip key={category.id} label={category.name} />
                     })
 
@@ -55,12 +66,12 @@ const MenuList: React.FC = () => {
                 field: 'actions',
                 headerName: 'Actions',
                 sortable: false,
-                width: 180,
+                width: 200,
                 renderCell
             }
         ]
 
-    }, [renderCell])
+    }, [renderCell, categories])
 
 
     return <>
@@ -76,6 +87,21 @@ const MenuList: React.FC = () => {
                     <Button variant='contained' color="primary" onClick={handleAddClick}>Add</Button>
                 </Grid2>
             </Grid2>
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    maxHeight:700,
+                    minHeight:200,
+                }}
+            >
+
+                <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    pageSizeOptions={[5, 10, 20]}
+                />
+            </div>
         </Paper>
     </>
 

@@ -7,6 +7,7 @@ import CategoryProvider from "./components/Providers/CategoryProvider"
 import RecipeProvider from "./components/Providers/RecipeProvider"
 import { SnackbarProvider } from "notistack"
 import { BrowserRouter, Route, Routes } from "react-router"
+import MenuProvider from "./components/Providers/MenuProvider"
 
 const App: React.FC = () => {
 
@@ -21,7 +22,9 @@ const App: React.FC = () => {
                   <AuthProvider>
                     <CategoryProvider>
                       <RecipeProvider>
+                        <MenuProvider>
                         <RoutesProvider />
+                        </MenuProvider>
                       </RecipeProvider>
                     </CategoryProvider>
                   </AuthProvider>

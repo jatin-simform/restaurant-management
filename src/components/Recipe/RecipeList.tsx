@@ -70,14 +70,12 @@ const RecipeList: React.FC = () => {
 
         if (!search) return recipes
 
-        return recipes.filter(d => d.name.includes(search) || d.description.includes(search) || (d.price + "").includes(search) || (d.weight+"").includes(search));
+        return recipes.filter(d => d.name.includes(search) || d.description.includes(search) || (d.price + "").includes(search) || (d.weight + "").includes(search));
 
     }, [search, recipes])
 
     return <>
-        {
-            isLoading && <LinearProgress color="secondary" />
-        }
+        {isLoading && <LinearProgress color="secondary" />}
         <Paper elevation={12} style={{ marginTop: "5%", marginLeft: '5%', padding: '25px', width: "90%", height: '70vh' }}>
             <Grid2 container spacing={5} padding={5}>
                 <Grid2 size={6}>
@@ -102,6 +100,8 @@ const RecipeList: React.FC = () => {
                         <DataGrid
                             rows={data}
                             columns={columns}
+                            pagination={true}
+
                             pageSizeOptions={[5, 10, 20]} // Define page size options
                         />
                     </div>

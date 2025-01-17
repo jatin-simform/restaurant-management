@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { TextField, Button, Typography, Box, Divider, Grid2 } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
 import AppleIcon from '@mui/icons-material/Apple';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import API from '../../api';
 import { AxiosError } from 'axios';
 import useNotification from '../../hooks/useNotification';
@@ -12,12 +12,10 @@ const RegistrationForm: React.FC = () => {
   const [lastName, setLastName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [errors, setErrors] = useState<{ firstName: string; lastName: string; email: string; password: string }>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-  });
+  const navigate = useNavigate();
+
+  const [errors, setErrors] = useState<{ firstName: string; lastName: string; email: string; password: string }>({ firstName: '', lastName: '', email: '', password: '', });
+
   const { notifyError } = useNotification();
 
   const handleSubmit = useCallback((event: React.FormEvent) => {
@@ -27,8 +25,9 @@ const RegistrationForm: React.FC = () => {
     const fn = async () => {
       try {
         const res = await API.register({ firstName, lastName, email, password })
-        if (res.status === 201) { throw new Error("Failed to register user") }
-        //todo navigate to dashboard
+        if (res.status !== 201) { throw new Error("Failed to register user") }
+        navigate("/login")
+        return;
       } catch (e: unknown) {
 
         if (e instanceof AxiosError) {

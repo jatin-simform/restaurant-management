@@ -8,12 +8,13 @@ import PublicLayout from "../Layout/PublicLayout"
 import Login from "../../pages/Login"
 import Registration from "../../pages/Registration"
 import useAuth from "../../hooks/useAuth"
+import Search from "../../pages/Search"
 
 const RoutesProvider: React.FC = () => {
 
     const { data } = useAuth();
     const { isLoggedIn } = data
-    
+
     return <>
         <Routes>
             {
@@ -23,14 +24,16 @@ const RoutesProvider: React.FC = () => {
                         <Route path="/menus/*" element={<Menu />} />
                         <Route path="/recipes/*" element={<Recipes />} />
                         <Route path="/categories" element={<Categories />} />
+                        <Route path="/search" element={<Search />} />
                     </Route>
-                </> : <>
-                    <Route path="/" element={<PublicLayout />} >
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Registration />} />
-                        <Route path="/" element={<Navigate to="/login" />} />
-                    </Route>
-                </>
+                </> :
+                    <>
+                        <Route path="/" element={<PublicLayout />} >
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<Registration />} />
+                            <Route path="/" element={<Navigate to="/login" />} />
+                        </Route>
+                    </>
             }
         </Routes>
     </>

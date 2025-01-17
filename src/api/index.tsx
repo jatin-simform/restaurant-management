@@ -16,7 +16,8 @@ const API = {
         return axios.post(url, data)
     },
     register: (data: any) => {
-        return axios.post(baseURL + "/register", data)
+        const url='https://dummyjson.com/users/add'
+        return axios.post(url, data)
     },
     menus: () => {
         return axios.get(baseURL + "/menus")

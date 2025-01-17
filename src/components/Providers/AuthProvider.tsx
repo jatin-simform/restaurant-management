@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useReducer, useState } from "react"
-import authContext, { IAuthData, IAuthUser } from "../../contexts/authContext"
+import { useCallback, useEffect,  useState } from "react"
+import authContext, {  IAuthUser } from "../../contexts/authContext"
 import authApi, { AuthPayload } from "../../api"
 import useNotification from "../../hooks/useNotification"
 import { useNavigate } from "react-router"
+import axios from "axios"
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
 
@@ -19,7 +20,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
             notifyError("Something went wrong!");
             console.error(new Error("Local storage not found"));
             return
-            
+
         }
         let authData = localStorage.getItem("AuthData");
 
@@ -29,10 +30,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
             if (parsedAuthData) {
                 setLoggedIn(true);
                 setAuthUser(parsedAuthData);
+                axios.defaults.headers["X-Auth-Token"]=parsedAuthData.accessToken;
             }
 
         }else{
-            throw new Error("Something went wrong")
+
+            throw new Error("Something went wrong");
+
         }
 
         setLoading(false);
@@ -48,6 +52,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     }, [ navigate])
 
     const login = useCallback((data: AuthPayload) => {
+        
         const fn = async () => {
 
             setLoading(true)
@@ -57,15 +62,16 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
                 if (res.status !== 200) throw new Error("Login failed")
 
                 localStorage.setItem("AuthData", JSON.stringify(res.data));
+                axios.defaults.headers["X-Auth-Token"]=res.data.accessToken;
                 setLoggedIn(true);
                 setAuthUser(res.data);
                 setLoading(false);
                 navigate("/")
-
-
             } catch (e: unknown) {
+
                 notifyError("Login Failed!")
                 console.log("Error", e)
+                
             } finally {
                 setLoading(false)
 

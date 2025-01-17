@@ -21,6 +21,7 @@ const Layout: React.FC = () => {
             { action:handleNavigation("/categories"), name: "Categories" },
             { action: handleNavigation("/menus"), name: "Menus" },
             { action:handleNavigation("/recipes"), name: "Recipes" },
+            { action:handleNavigation("/search"), name: "Search" },
         ]
     },[handleNavigation])
 

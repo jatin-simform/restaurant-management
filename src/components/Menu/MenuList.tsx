@@ -1,6 +1,6 @@
-import { Button, Chip, Grid2, LinearProgress, Paper, Typography } from "@mui/material";
+import { Button, Chip, Grid2, LinearProgress, Paper, TextField, Typography } from "@mui/material";
 import useMenu from "../../hooks/useMenu";
-import { useCallback, useMemo } from "react";
+import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { ICategory, IMenu } from "../../types";
 import { useNavigate } from "react-router";
 import { DataGrid } from "@mui/x-data-grid";
@@ -10,8 +10,8 @@ import useCategories from "../../hooks/useCategories";
 
 const MenuList: React.FC = () => {
 
-    const { delete: _remove, isLoaded, isLoading, items: rows, update } = useMenu();
-
+    const { delete: _remove, isLoading, items: rows } = useMenu();
+    const [search, setSearch] = useState('');
     const { items: categories } = useCategories();
 
     const navigate = useNavigate();
@@ -41,7 +41,14 @@ const MenuList: React.FC = () => {
             <Button onClick={onClickDelete} color="error">Delete</Button>
         </>
 
-    }, [navigate])
+    }, [navigate]);
+
+    const handleSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+
+        const { value } = e.target
+        setSearch(value);
+
+    }, [])
 
     const columns = useMemo(() => {
 
@@ -73,6 +80,13 @@ const MenuList: React.FC = () => {
 
     }, [renderCell, categories])
 
+    const data = useMemo(() => {
+
+        if (!search) return rows
+
+        return rows.filter(d => d.name.includes(search));
+
+    }, [search, rows])
 
     return <>
         {
@@ -80,8 +94,11 @@ const MenuList: React.FC = () => {
         }
         <Paper elevation={12} style={{ marginTop: "5%", marginLeft: '5%', padding: '25px', width: "90%", height: '70vh' }}>
             <Grid2 container spacing={5} padding={5}>
-                <Grid2 size={10}>
+                <Grid2 size={6}>
                     <Typography variant="h4" fontSize={24} >Manage Menu</Typography>
+                </Grid2>
+                <Grid2 size={4}>
+                    <TextField size="small" fullWidth onChange={handleSearchChange} label="Search" />
                 </Grid2>
                 <Grid2 size={2}>
                     <Button variant='contained' color="primary" onClick={handleAddClick}>Add</Button>
@@ -91,13 +108,12 @@ const MenuList: React.FC = () => {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    maxHeight:700,
-                    minHeight:200,
+                    maxHeight: 700,
+                    minHeight: 200,
                 }}
             >
-
                 <DataGrid
-                    rows={rows}
+                    rows={data}
                     columns={columns}
                     pageSizeOptions={[5, 10, 20]}
                 />

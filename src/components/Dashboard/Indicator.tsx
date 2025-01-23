@@ -9,7 +9,7 @@ export interface IIndicatorProps {
 
 const Indicator: React.FC<IIndicatorProps> = ({ count, text ,icon}) => {
 
-    return <Grid2 size={{ xs: 12, sm: 12 ,md:4}}>
+    return <Grid2 size={{ xs: 12, sm: 6 ,md:6,lg:4,xl:4}}>
         <div className="indicator-container">
             <Grid2 container justifyContent='space-around' alignItems="center">
                 <Grid2 padding={2} size={6} >

@@ -149,9 +149,8 @@ const MenuForm: React.FC = () => {
             {
                 !isLoading && <>
                     <Grid2 container>
-                        <Grid2 container size={12} justifyContent={'space-between'}>
+                        <Grid2 container size={12} spacing={5} justifyContent={'space-between'}>
                             <Grid2 container direction={'column'} alignItems={'center'} justifyContent={'center'}
-                                height={70}
                                 size={{
                                     sm: 4,
                                     md: 4,
@@ -188,6 +187,8 @@ const MenuForm: React.FC = () => {
                         <Grid2 direction={'column'} container size={12} justifyContent={'space-between'}>
                             <Grid2 size={12} container justifyContent={'start'}>
                                 <Tabs
+                                    variant='scrollable'
+                                    allowScrollButtonsMobile
                                     value={curCategory} onChange={handleCategoryTabChange} >
                                     {categories.filter(c => formData.categories.includes(c.id)).map((item, index) => {
                                         return <Tab key={item.id + index} label={item.name} />

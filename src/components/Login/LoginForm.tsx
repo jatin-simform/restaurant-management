@@ -134,7 +134,7 @@ const LoginForm: React.FC = () => {
         </Button>
         <Divider sx={{ marginY: 2 }} />
         <Box display={'flex'} justifyContent={'space-around'}>
-          <Box width={'50%'} display={'flex'} alignItems={'center'} justifyContent={'center'}>
+          <Box width={'50%'} display={'flex'} alignItems={'center'} flexDirection={'column'}  justifyContent={'center'}>
             <Typography variant="body2" align="center" >
               Don't have an account?
             </Typography>

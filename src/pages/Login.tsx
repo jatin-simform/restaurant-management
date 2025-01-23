@@ -5,7 +5,18 @@ import MainTheme from "../Theme/MainTheme"
 
 const Login: React.FC = () => {
    return <>
-      <Grid2 container justifyContent={'space-between'}
+      <Grid2 container
+
+         justifyContent={
+            {
+               xs: 'center',
+               md: 'center',
+               sm: 'center',
+               xl: 'space-between',
+               lg: 'space-between'
+            }
+         }
+
          spacing={0}
          height={'100vh'}>
          <Grid2 size={{
@@ -15,11 +26,15 @@ const Login: React.FC = () => {
             <Typography variant="h3" fontSize={48} color="secondary" padding={5} fontWeight={900} >Sego</Typography>
             <LoginForm />
          </Grid2>
-         <Grid2 size={5} display={{
-            xs: 'none',
-            md: 'block',
-            sm: 'block'
-         }}
+         <Grid2 size={5}
+
+            display={{
+               xs: 'none',
+               md: 'none',
+               sm: 'none',
+               lg: 'block',
+               xl: 'block'
+            }}
             padding={3}
          >
             <Paper

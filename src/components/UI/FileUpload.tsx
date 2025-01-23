@@ -31,12 +31,11 @@ const InputFileUpload: React.FC<IInputFileUploadProps> = ({ onChange, error, hel
         tabIndex={-1}
         startIcon={<CloudUploadIcon />}
       >
-        Upload files
+        Upload Image
         <VisuallyHiddenInput
           type="file"
           accept="image/*"
           onChange={onChange}
-          multiple
         />
       </Button>
       {error && <Typography color='error' variant='caption'>{helperText}</Typography>}

@@ -117,14 +117,14 @@ const MenuList: React.FC = () => {
                 }}
             >
                 <DialogTitle>
-                    <Typography variant="h3" color="secondary">{curMenu.name}</Typography>
+                    <Typography variant="h3" color="secondary" fontSize={30}  fontWeight={900} align="center">{curMenu.name}</Typography>
                 </DialogTitle>
                 <DialogContent>
                     <MenuView selectedCategories={curMenu.categories} selectedItems={curMenu.items} />
                 </DialogContent>
                 <DialogActions>
                     {/* Close Button */}
-                    <Button onClick={() => { setMenu(null) }} color="primary">
+                    <Button variant="contained" onClick={() => { setMenu(null) }} color="primary">
                         Close
                     </Button>
                 </DialogActions>

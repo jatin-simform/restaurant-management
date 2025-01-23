@@ -162,13 +162,13 @@ const RegistrationForm: React.FC = () => {
         </Typography>
         <Divider sx={{ marginY: 2 }} />
         <Box display={'flex'} justifyContent={'space-around'}>
-          <Box width={'50%'} display={'flex'} alignItems={'center'} justifyContent={'center'}>
+          <Box width={'100%'} display={'flex'} alignItems={'center'} flexDirection={'column'} justifyContent={'center'}>
             <Typography variant="body2" align="center" >
               Already have an account?
             </Typography>
             <Link to={'/login'} >
               <Typography variant="body2" align="right" fontWeight={900} fontSize={16} textTransform={'none'} >
-                Signin
+                SignIn
               </Typography>
             </Link>
           </Box>

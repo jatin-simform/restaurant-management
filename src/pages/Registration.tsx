@@ -6,19 +6,30 @@ import MainTheme from "../Theme/MainTheme"
 const Registration: React.FC = () => {
 
    return <>
-      <Grid2 container justifyContent={'space-between'}
+      <Grid2 container justifyContent={
+         {
+            xs: 'center',
+            md: 'center',
+            sm: 'center',
+            xl:'space-between',
+            lg:'space-between'
+         }
+      }
          spacing={0}
          height={'100vh'}>
-         <Grid2 size={5} display={{
+         <Grid2 size={5} 
+         display={{
             xs: 'none',
-            md: 'block',
-            sm: 'block'
+            md: 'none',
+            sm: 'none',
+            lg:'block',
+            xl:'block'
          }}
             padding={3}
             position={'relative'}
          >
             <Typography variant="h3" position={'absolute'} fontSize={48} color="secondary" padding={5} fontWeight={900}
-            
+
             >Sego</Typography>
             <Paper
                elevation={0}

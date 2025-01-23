@@ -114,7 +114,7 @@ const Search = () => {
                     sm: 12,
                     xs: 12
                 }}>
-                    <TextField variant="standard"  fullWidth value={search} label="Search" placeholder="Search" onChange={(e) => {
+                    <TextField variant="standard" fullWidth value={search} size="small" label="Search" placeholder="Search" onChange={(e) => {
                         setSearch(e.target.value)
                     }} />
                 </Grid2>
@@ -124,13 +124,12 @@ const Search = () => {
                     xs: 12
                 }} padding={1}>
                     <FormControl variant="standard" size="small" fullWidth>
-                        <InputLabel id="menu">Filter By Menu</InputLabel>
+                        <InputLabel id="menu">Menus</InputLabel>
                         <Select
-                            fullWidth
                             labelId="menu"
                             value={selectedMenu}
                             onChange={handleMenuSelect}
-                            label="Filter By Menu"
+                            label="Menus"
                         >
                             {menu.map((m, index) => {
                                 return <MenuItem value={index} key={index} >{m.name}</MenuItem>
@@ -138,19 +137,15 @@ const Search = () => {
                         </Select>
                     </FormControl>
                 </Grid2>
-                <Grid2 container size={{
-                    md: 3,
-                    sm: 12,
-                    xs: 12
-                }} padding={1}>
+                <Grid2 container size={{ md: 3, sm: 12, xs: 12 }} padding={1}>
                     <FormControl variant="standard" size="small" fullWidth >
-                        <InputLabel id="category">Filter By Category</InputLabel>
+                        <InputLabel id="category">Categories</InputLabel>
                         <Select
                             fullWidth
                             labelId="category"
                             value={selectedCategory}
                             onChange={handleCategorySelect}
-                            label="Filter By Category"
+                            label="Categories"
                         >
                             {filteredCategories.map((m, index) => {
                                 return <MenuItem value={index} key={index} >{m.name}</MenuItem>
@@ -158,43 +153,19 @@ const Search = () => {
                         </Select>
                     </FormControl>
                 </Grid2>
-                <Grid2 container size={2} padding={1} >
-                    <Button size="medium" onClick={onClickClear} color="secondary"> Clear</Button>
+                <Grid2 container size={{lg:2,md:2,xl:2,sm:12,xs:12}}  padding={1} justifyContent={'center'} alignItems={'center'} >
+                    <Button size="small" variant="contained" onClick={onClickClear} color="primary"> Clear</Button>
                 </Grid2>
             </Grid2>
 
             <Grid2 container
                 size={12} marginTop={5}
-                columnSpacing={{
-                    md: 2,
-                    xs: 4,
-                }}
-                rowSpacing={{
-                    md: 2,
-                    xs: 4,
-
-                }}
+                columnSpacing={{ md: 2, xs: 4, }}
+                rowSpacing={{ md: 2, xs: 4, }}
             >
-                {displayItems.map((item, index) => {
-                    return <>
-                        <Grid2 container size={{
-                            sm: 15, md: 4,
-                            xs: 12,
-                        }} border={1}
-                            borderColor={'lightgrey'}
-                            borderRadius={6} justifyContent={'space-around'}
-                            alignItems={'center'}
-                            height={{ sm: 200, md: 250, }}
-                            rowSpacing={1}
-                        >
-                            <RecipeCard recipe={item} key={index} />
-                        </Grid2>
-                    </>
-                })}
+                {displayItems.map((item) => <RecipeCard recipe={item} key={item.id} />)}
                 <Grid2 size={12} marginTop={2} container justifyContent="center">
-                    {
-                        items.length === 0 && <EmptyState />
-                    }
+                    {items.length === 0 && <EmptyState />}
                     {
                         items.length > 0 && <Pagination variant={'outlined'} size="large"
 

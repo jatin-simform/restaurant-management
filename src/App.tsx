@@ -17,7 +17,7 @@ const App: React.FC = () => {
     <>
       <ThemeProvider theme={MainTheme}>
         <Provider store={store}>
-          <SnackbarProvider maxSnack={50}>
+          <SnackbarProvider maxSnack={3}>
             <NotificationProvider>
               <BrowserRouter>
                 <Routes>

@@ -28,15 +28,16 @@ const MenuView: React.FC<IMenuViewProps> = ({ selectedCategories, selectedItems 
                                 {
                                     cRecipes.map((r, index) => {
                                         return <Fragment key={index}>
-                                            <ListItem>
+                                            <ListItem >
                                                 <ListItemAvatar >
                                                     <img src={r.image} alt={r.name} width={75} height={75} />
-                                                    {/* <Avatar alt="Remy Sharp" src={r.image} /> */}
                                                 </ListItemAvatar>
                                                 <ListItemText>
-                                                    <Typography textAlign={'left'} padding={2} ><strong>{r.name}</strong></Typography>
+                                                    <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} width={'100%'}>
+                                                        <Typography textAlign={'center'} padding={2} ><strong>{r.name}</strong></Typography>
+                                                        <Chip label={`${r.qty}+/$${r.price}`} color="info" />
+                                                    </Box>
                                                 </ListItemText>
-                                                    <Chip label={`${r.qty}+/$${r.price}`} color="primary" />
                                             </ListItem>
                                         </Fragment>
                                     })

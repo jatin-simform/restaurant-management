@@ -219,6 +219,7 @@ const RecipeForm: React.FC = ({ }) => {
                     <Grid2 size={12}>
                         <InputFileUpload onChange={handleFileChange}
                             error={Boolean(errors.image)}
+                        
                             helperText={errors.image || ""}
                         />
                     </Grid2>

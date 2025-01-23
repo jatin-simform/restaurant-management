@@ -1,10 +1,14 @@
-import { Button, Chip, Grid2, LinearProgress, Paper, TextField, Typography } from "@mui/material";
+import {   Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid2, IconButton, LinearProgress, Paper, Typography } from "@mui/material";
 import useMenu from "../../hooks/useMenu";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import React, {  useCallback, useEffect, useMemo, useState } from "react";
 import { ICategory, IMenu } from "../../types";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { DataGrid } from "@mui/x-data-grid";
 import useCategories from "../../hooks/useCategories";
+import { Delete, Edit,  RemoveRedEye } from "@mui/icons-material";
+import EmptyState from "../EmptyState";
+import BackButton from "../BackButton";
+import MenuView from "./MenuView";
 
 
 
@@ -12,6 +16,14 @@ const MenuList: React.FC = () => {
 
     const { delete: _remove, isLoading, items: rows } = useMenu();
     const [search, setSearch] = useState('');
+    const [searchParams] = useSearchParams();
+    const [curMenu, setMenu] = useState<IMenu | null>(null)
+
+    useEffect(() => {
+        let value = searchParams.get('search') || ''
+        setSearch(value.toLocaleLowerCase())
+    }, [searchParams])
+
     const { items: categories } = useCategories();
 
     const navigate = useNavigate();
@@ -22,7 +34,7 @@ const MenuList: React.FC = () => {
 
     }, [])
 
-    const renderCell = useCallback((params: { row: { id: string } }) => {
+    const renderCell = useCallback((params: { row: IMenu }) => {
 
         const onClickEdit = () => {
 
@@ -35,20 +47,19 @@ const MenuList: React.FC = () => {
             _remove(params.row.id)
 
         }
+        const onClickShow = () => {
+
+            setMenu(params.row)
+
+        }
 
         return <>
-            <Button onClick={onClickEdit} color="primary" >Edit</Button>
-            <Button onClick={onClickDelete} color="error">Delete</Button>
+            <IconButton onClick={onClickEdit} color="primary"><Edit /></IconButton>
+            <IconButton onClick={onClickDelete} color="secondary"><Delete /></IconButton>
+            <IconButton onClick={onClickShow}><RemoveRedEye /> </IconButton>
         </>
 
     }, [navigate]);
-
-    const handleSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-
-        const { value } = e.target
-        setSearch(value);
-
-    }, [])
 
     const columns = useMemo(() => {
 
@@ -84,26 +95,56 @@ const MenuList: React.FC = () => {
 
         if (!search) return rows
 
-        return rows.filter(d => d.name.includes(search));
+        return rows.filter(d => d.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
 
     }, [search, rows])
+
+    const menuContent = useMemo(() => {
+
+        if (!curMenu) return null;
+
+        return <>
+            <Dialog open={true} onClose={() => { setMenu(null) }}
+                sx={{
+                    '& .MuiDialogContent-root': {
+                        padding: '16px',
+                    },
+                    '& .MuiDialog-paper': {
+                        width: '100%',       // Adjust the width to 80% of the viewport
+                        maxHeight: '90vh',  // Adjust the height to 90% of the viewport
+                        height: 'auto',     // Ensure the height adjusts with content
+                    }
+                }}
+            >
+                <DialogTitle>
+                    <Typography variant="h3" color="secondary">{curMenu.name}</Typography>
+                </DialogTitle>
+                <DialogContent>
+                    <MenuView selectedCategories={curMenu.categories} selectedItems={curMenu.items} />
+                </DialogContent>
+                <DialogActions>
+                    {/* Close Button */}
+                    <Button onClick={() => { setMenu(null) }} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
+
+
+    }, [curMenu])
 
     return <>
         {
             isLoading && <LinearProgress color="secondary" />
         }
-        <Paper elevation={12} style={{ marginTop: "5%", marginLeft: '5%', padding: '25px', width: "90%", height: '70vh' }}>
-            <Grid2 container spacing={5} padding={5}>
-                <Grid2 size={6}>
-                    <Typography variant="h4" fontSize={24} >Manage Menu</Typography>
-                </Grid2>
-                <Grid2 size={4}>
-                    <TextField size="small" fullWidth onChange={handleSearchChange} label="Search" />
-                </Grid2>
-                <Grid2 size={2}>
-                    <Button variant='contained' color="primary" onClick={handleAddClick}>Add</Button>
-                </Grid2>
+        {menuContent}
+        <Paper elevation={0} style={{ padding: '25px' }}>
+            <Grid2 container justifyContent="space-between" alignItems="center" size={12} padding={1} justifyItems={'end'}>
+                <BackButton />
+                <Button style={{ float: 'right' }} variant='contained' color="primary" onClick={handleAddClick}>Add</Button>
             </Grid2>
+            <Divider style={{ marginBottom: 10 }} />
             <div
                 style={{
                     display: 'flex',
@@ -112,11 +153,18 @@ const MenuList: React.FC = () => {
                     minHeight: 200,
                 }}
             >
-                <DataGrid
-                    rows={data}
-                    columns={columns}
-                    pageSizeOptions={[5, 10, 20]}
-                />
+                {
+                    data.length === 0 ?
+                        <Grid2 size={12} marginTop={2} container justifyContent="center">
+                            <EmptyState />
+                        </Grid2>
+                        : <DataGrid
+                            rows={[...data].reverse()}
+                            initialState={{ pagination: { paginationModel: { pageSize: 10, }, }, }}
+                            columns={columns}
+                            disableRowSelectionOnClick
+                        />
+                }
             </div>
         </Paper>
     </>

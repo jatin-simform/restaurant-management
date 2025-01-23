@@ -1,11 +1,12 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { TextField, Button, Grid2, FormControl, InputLabel, MenuItem, Select, Paper, Typography, SelectChangeEvent } from '@mui/material';
+import { TextField, Button, Grid2, FormControl, InputLabel, MenuItem, Select, Paper, Typography, SelectChangeEvent, Box, Divider } from '@mui/material';
 import useCategories from '../../hooks/useCategories';
 import InputFileUpload from '../UI/FileUpload';
 import { IRecipe } from '../../types';
 import useRecipes from '../../hooks/useRecipes';
 import { useNavigate, useParams } from 'react-router';
+import BackButton from '../BackButton';
 
 
 const validateRecipe = (recipe: IRecipe) => {
@@ -52,7 +53,7 @@ const defultState: IRecipe = {
     image: '',
     price: 0,
     qty: '',
-    weight: 0,
+    weight: '',
     categoryID: ''
 }
 
@@ -127,8 +128,8 @@ const RecipeForm: React.FC = ({ }) => {
                 navigate("/recipes")
             } else {
 
-                let newId = await add({ ...formData });
-                navigate("/recipes/" + newId)
+                await add({ ...formData });
+                navigate("/recipes")
             }
 
         }
@@ -145,104 +146,126 @@ const RecipeForm: React.FC = ({ }) => {
     }, [formData])
 
     return (
-        <Paper elevation={12} style={{ display: 'flex', flexDirection: 'row', marginTop: "5%", marginLeft: '5%', padding: '25px', width: "90%", height: '70vh' }}>
-            <Grid2 container spacing={2} padding={5} width={"50%"}>
-                <Grid2 size={10}>
-                    <Typography variant="h4" fontSize={24} >{formData.id === '' ? "Add " : "Edit "} Recipes</Typography>
-                </Grid2>
-                <Grid2 size={6}>
-                    <TextField
-                        size='small'
-                        label="Name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        fullWidth
-                        error={Boolean(errors.name)}
-                        helperText={errors.name}
-                    />
-                </Grid2>
-                <Grid2 size={6}>
-                    <FormControl fullWidth>
-                        <InputLabel id="category">Cateogry</InputLabel>
-                        <Select
+        <Paper elevation={0} style={{
+            marginTop:25
+        }} >
+            <Box marginBottom={5} >
+                <BackButton/>
+                <Divider style={{marginTop:10}}/>
+            </Box>
+
+            <Grid2 container direction={{
+                sm: 'row',
+                xs: 'column-reverse',
+                md: 'row'
+            }}
+                spacing={5}
+            >
+                
+                <Grid2 container spacing={2} size={{
+                    sm: 6,
+                    xs: 12,
+                    md: 6
+                }} >
+                    <Grid2 size={6}>
+                        <TextField
                             size='small'
-                            labelId="category"
-                            name="categoryID"
-                            id="category-select"
-                            label="Cateogry"
-                            error={Boolean(errors.categoryID)}
-                            value={formData.categoryID}
-                            onChange={handleCategoryChange}
-                        >
-                            {
-                                categories.map((item, index) => {
-                                    return <MenuItem value={item.id} key={index}>{item.name}</MenuItem>
-                                })
-                            }
-                        </Select>
-                        <Typography color='error' variant='caption'>{errors.categoryID !== '' ? errors.categoryID : ''}</Typography>
-                    </FormControl>
+                            label="Name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            fullWidth
+                            error={Boolean(errors.name)}
+                            helperText={errors.name}
+                        />
+                    </Grid2>
+                    <Grid2 size={6}>
+                        <FormControl fullWidth>
+                            <InputLabel id="category">Cateogry</InputLabel>
+                            <Select
+                                size='small'
+                                labelId="category"
+                                name="categoryID"
+                                id="category-select"
+                                label="Cateogry"
+                                error={Boolean(errors.categoryID)}
+                                value={formData.categoryID}
+                                onChange={handleCategoryChange}
+                            >
+                                {
+                                    categories.map((item, index) => {
+                                        return <MenuItem value={item.id} key={index}>{item.name}</MenuItem>
+                                    })
+                                }
+                            </Select>
+                            <Typography color='error' variant='caption'>{errors.categoryID !== '' ? errors.categoryID : ''}</Typography>
+                        </FormControl>
+                    </Grid2>
+
+                    <Grid2 size={12}>
+                        <TextField
+                            multiline
+                            rows={4}
+                            size='small'
+                            label="Description"
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            fullWidth
+                            error={Boolean(errors.description)}
+                            helperText={errors.description !== '' ? errors.description : ''}
+                        />
+                    </Grid2>
+                    <Grid2 size={12}>
+                        <InputFileUpload onChange={handleFileChange}
+                            error={Boolean(errors.image)}
+                            helperText={errors.image || ""}
+                        />
+                    </Grid2>
+                    <Grid2 size={6}>
+                        <TextField
+                            size='small'
+                            label="Price"
+                            name="price"
+                            type="number"
+                            value={formData.price}
+                            onChange={handleChange}
+                            fullWidth
+                            error={Boolean(errors.price)}
+                            helperText={errors.price || ""}
+                        />
+                    </Grid2>
+                    <Grid2 size={6}>
+                        <TextField
+                            size='small'
+                            label="Quantity"
+                            name="qty"
+                            value={formData.qty}
+                            onChange={handleChange}
+                            fullWidth
+                            error={Boolean(errors.qty)}
+                            helperText={errors.qty || ""}
+                        />
+                    </Grid2>
+
+                    <Grid2 size={12} container justifyContent={'end'}>
+                        <Button type="submit" variant="contained" onClick={handleSubmit} color="primary" >
+                            Submit
+                        </Button>
+                    </Grid2>
+                </Grid2>
+                <Grid2 container size={{
+                    sm: 6,
+                    xs: 12,
+                    md: 6
+                }}>
+                    <Grid2 size={12} >
+                        {
+                            formData.image && <img style={{ width: '250px' }} src={formData.image} />
+                        }
+                    </Grid2>
                 </Grid2>
 
-                <Grid2 size={12}>
-                    <TextField
-                        multiline
-                        rows={4}
-                        size='small'
-                        label="Description"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        fullWidth
-                        error={Boolean(errors.description)}
-                        helperText={errors.description !== '' ? errors.description : ''}
-                    />
-                </Grid2>
-                <Grid2 size={12}>
-                    <InputFileUpload onChange={handleFileChange}
-                        error={Boolean(errors.image)}
-                        helperText={errors.image || ""}
-                    />
-                </Grid2>
-                <Grid2 size={6}>
-                    <TextField
-                        size='small'
-                        label="Price"
-                        name="price"
-                        type="number"
-                        value={formData.price}
-                        onChange={handleChange}
-                        fullWidth
-                        error={Boolean(errors.price)}
-                        helperText={errors.price || ""}
-                    />
-                </Grid2>
-                <Grid2 size={6}>
-                    <TextField
-                        size='small'
-                        label="Quantity"
-                        name="qty"
-                        value={formData.qty}
-                        onChange={handleChange}
-                        fullWidth
-                        error={Boolean(errors.qty)}
-                        helperText={errors.qty || ""}
-                    />
-                </Grid2>
-
-                <Grid2 size={12}>
-                    <Button type="submit" variant="contained" onClick={handleSubmit} color="primary" fullWidth>
-                        Submit
-                    </Button>
-                </Grid2>
-            </Grid2>
-            <Grid2 container width={'50%'}>
-                <Grid2 size={12} >
-                    {
-                        formData.image && <img style={{ width: '100%' }} src={formData.image} />
-                    }
-                </Grid2>
             </Grid2>
         </Paper>
     );

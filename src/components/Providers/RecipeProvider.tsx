@@ -87,6 +87,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
             }
 
             dispatch(deleteRecipe(id));
+            notifySuccess("Record is deleted successfuly")
 
         } catch (e: unknown) {
 
@@ -100,7 +101,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
         return id;
 
-    }, []);
+    }, [notifyError,notifySuccess]);
 
     const update = useCallback(async (data: IRecipe) => {
 
@@ -126,7 +127,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
         return data.id;
 
-    }, [dispatch]);
+    }, [dispatch,notifyError,notifySuccess]);
 
 
     return <racipeContext.Provider value={{ isLoaded, items, add, delete: _delete, update, isLoading }}>

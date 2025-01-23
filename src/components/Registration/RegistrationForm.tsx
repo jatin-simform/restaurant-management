@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import { TextField, Button, Typography, Box, Divider, Grid2 } from '@mui/material';
-import GoogleIcon from '@mui/icons-material/Google';
 import AppleIcon from '@mui/icons-material/Apple';
 import { Link, useNavigate } from 'react-router';
 import API from '../../api';
 import { AxiosError } from 'axios';
 import useNotification from '../../hooks/useNotification';
+import GoogleIcon from '../UI/Icons/GoogleIcon';
 
 const RegistrationForm: React.FC = () => {
   const [firstName, setFirstName] = useState<string>('');
@@ -16,7 +16,7 @@ const RegistrationForm: React.FC = () => {
 
   const [errors, setErrors] = useState<{ firstName: string; lastName: string; email: string; password: string }>({ firstName: '', lastName: '', email: '', password: '', });
 
-  const { notifyError } = useNotification();
+  const { notifyError, notifySuccess } = useNotification();
 
   const handleSubmit = useCallback((event: React.FormEvent) => {
 
@@ -26,6 +26,7 @@ const RegistrationForm: React.FC = () => {
       try {
         const res = await API.register({ firstName, lastName, email, password })
         if (res.status !== 201) { throw new Error("Failed to register user") }
+        notifySuccess("Registration done successfully !")
         navigate("/login")
         return;
       } catch (e: unknown) {
@@ -75,46 +76,34 @@ const RegistrationForm: React.FC = () => {
       fn();
 
     }
-  }, [firstName, lastName, email, password]);
+  }, [firstName, lastName, email, password,notifyError,notifySuccess]);
 
   return (
-    <Box
-      sx={{ maxWidth: 500, margin: '0 auto', padding: 3, background: '#ffffff7d', borderRadius: '10px', }}
-    >
-      <Typography variant="h4" fontWeight={900} gutterBottom>
+    <Box sx={{ maxWidth: 500, margin: '0 auto', padding: 3 }}  >
+      <Typography variant="h3" fontSize={32} color="secondary" textAlign='center' fontWeight={900} >
         Sign up for an account
       </Typography>
-      <Typography variant="body1" color="textSecondary" gutterBottom>
-        Send, spend and save smarter
+      <Typography variant="body1" color="textSecondary" textAlign={'center'} padding={3} gutterBottom>
+        Effortless Dining, Exceptional Service.
       </Typography>
 
-      <Grid2 container justifyContent={'space-between'}>
-        <Grid2 size={5}>
-          <Button
-            variant="outlined"
-            fullWidth
-            size='small'
-            startIcon={<GoogleIcon />}
-            sx={{ marginBottom: 1 }}
-          >
+      <Grid2 container justifyContent={'space-between'} spacing={1}>
+        <Grid2 size={{ sm: 6, md: 6, xs: 12 }}>
+          <Button variant="outlined" fullWidth size='large' style={{ textTransform: 'none' }} startIcon={<GoogleIcon />}>
             Sign In with Google
           </Button>
-
         </Grid2>
-        <Grid2 size={5}>
-          <Button
-            variant="outlined"
-            fullWidth
-            size='small'
-            startIcon={<AppleIcon />}
-            sx={{ marginBottom: 1 }}
-          >
+        <Grid2 size={{ sm: 6, md: 6, xs: 12 }}>
+          <Button variant="outlined" fullWidth size='large' style={{ textTransform: 'none' }} startIcon={<AppleIcon style={{ color: 'black' }} />}>
             Sign In with Apple
           </Button>
         </Grid2>
       </Grid2>
-      <Typography variant='h5' fontSize={18} textAlign={'center'} color='gray' fontWeight={900}>OR With Email</Typography>
-
+      <Box display={'flex'} padding={2} justifyContent={'space-around'}>
+        <Box height={10} borderColor={'lightgrey'} borderBottom={1} width={'25%'}></Box>
+        <Box><Typography variant='h5' fontSize={18} textAlign={'center'} color='gray' >OR With Email</Typography></Box>
+        <Box height={10} borderColor={'lightgrey'} borderBottom={1} width={'25%'} ></Box>
+      </Box>
 
       <form onSubmit={handleSubmit}>
         <TextField
@@ -161,6 +150,7 @@ const RegistrationForm: React.FC = () => {
           variant="contained"
           fullWidth
           sx={{ marginTop: 2 }}
+          size='large'
         >
           Sign Up
         </Button>
@@ -171,10 +161,18 @@ const RegistrationForm: React.FC = () => {
           <a href="#">Electronic Communication Policy</a>.
         </Typography>
         <Divider sx={{ marginY: 2 }} />
-        <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>
-          Already have an account?
-          <Link to={'/login'}>Sign In</Link>
-        </Typography>
+        <Box display={'flex'} justifyContent={'space-around'}>
+          <Box width={'50%'} display={'flex'} alignItems={'center'} justifyContent={'center'}>
+            <Typography variant="body2" align="center" >
+              Already have an account?
+            </Typography>
+            <Link to={'/login'} >
+              <Typography variant="body2" align="right" fontWeight={900} fontSize={16} textTransform={'none'} >
+                Signin
+              </Typography>
+            </Link>
+          </Box>
+        </Box>
       </form>
     </Box>
   );

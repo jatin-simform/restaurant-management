@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { IMenu } from '../../types';
-import { TextField, Button, Paper, Typography, Grid2, CircularProgress } from '@mui/material';
+import { TextField, Button, Paper, Typography, Grid2, CircularProgress, LinearProgress, Tabs, Tab, Box, Divider } from '@mui/material';
 import MultiSelect from '../UI/MultiSelect';
 import useCategories from '../../hooks/useCategories';
 import CategoryWiseItems from '../Category/CategoryWiseItems';
 import useMenu from '../../hooks/useMenu';
 import { useParams } from 'react-router';
+import useNotification from '../../hooks/useNotification';
+import BackButton from '../BackButton';
 
 const validate = (formData: IMenu) => {
 
@@ -31,8 +33,9 @@ const MenuForm: React.FC = () => {
     const { add, update, items: menus } = useMenu()
     const { id } = useParams<{ id: string }>();
     const [isLoading, setIsLoading] = useState(true);
-
-    console.log('id', id);
+    const [curCategory, setCurCategory] = useState(-1)
+    const { notifyError } = useNotification()
+    const [edited, setEdited] = useState(false);
 
     useEffect(() => {
 
@@ -43,7 +46,9 @@ const MenuForm: React.FC = () => {
             if (res) {
 
                 setFormData(res);
+                setCurCategory(0)
                 setErrors({});
+                setEdited(false)
 
             }
 
@@ -53,7 +58,6 @@ const MenuForm: React.FC = () => {
 
 
     const [formData, setFormData] = useState<IMenu>({ id: "", name: '', categories: [], items: [] });
-
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     useEffect(() => {
@@ -72,6 +76,7 @@ const MenuForm: React.FC = () => {
             ...formData,
             [name]: value
         });
+        setEdited(true)
     }, [formData]);
 
     const handleCategoriesSelect = useCallback((categoriesNames: string[]) => {
@@ -81,25 +86,31 @@ const MenuForm: React.FC = () => {
             ...formData,
             categories: categoriesIds
         });
+        setEdited(true)
     }, [formData, categories]);
 
     const handleRecipeSelect = useCallback((items: string[]) => {
-        console.log('items', items);
-        setFormData({ ...formData, items });
 
+        setFormData({ ...formData, items });
+        setEdited(true)
     }, [formData]);
+
 
     const handleSubmit = useCallback((e: React.FormEvent) => {
 
         e.preventDefault();
-
-        console.log('form data', formData);
-
+        setEdited(true)
         let res = validate(formData);
 
         if (res) {
 
             setErrors(res);
+
+            if (res.items) {
+
+                notifyError(res.items)
+
+            }
 
             return;
 
@@ -117,39 +128,76 @@ const MenuForm: React.FC = () => {
 
 
 
-    }, [formData, add, update]);
+    }, [formData, add, update, notifyError]);
 
     const categoriesNames = useMemo(() => categories.map(t => t.name), [categories]);
     const selectedCategories = useMemo(() => formData.categories.map(t => categories.find(c => c.id === t)?.name || ''), [formData, categories]);
+    const handleCategoryTabChange = useCallback((e: SyntheticEvent, newVal: number) => {
+
+        setCurCategory(newVal)
+
+    }, [])
 
 
     return (
-        <Paper elevation={12} style={{ marginTop: "5%", marginLeft: '5%', padding: '25px', width: "90%", height: '70vh' }}>
-            <Typography variant="h4" fontSize={24} >{!formData.id ? "Add" : "Edit"} Menu</Typography>
-            {
-                isLoading && <CircularProgress color='primary' />}
+        <Paper elevation={0} style={{ padding: '25px' }}>
+            {isLoading && <LinearProgress color='primary' />}
+            <Box marginBottom={5} >
+                <BackButton />
+                <Divider style={{ marginTop: 10 }} />
+            </Box>
             {
                 !isLoading && <>
                     <Grid2 container>
                         <Grid2 container size={12} justifyContent={'space-between'}>
-                            <Grid2 container direction={'column'} alignItems={'center'} justifyContent={'center'} size={4}>
+                            <Grid2 container direction={'column'} alignItems={'center'} justifyContent={'center'}
+                                height={70}
+                                size={{
+                                    sm: 4,
+                                    md: 4,
+                                    xs: 12
+                                }}>
                                 <TextField size='small' label="Name" name='name' value={formData.name} onChange={handleChange} fullWidth={true}
-                                    error={!!errors.name} helperText={errors.name}
+                                    error={!!errors.name && edited} helperText={edited ? errors.name : ''}
                                 />
                             </Grid2>
-                            <Grid2 container direction={'column'} alignItems={'center'} justifyContent={'center'} size={4}>
+                            <Grid2 height={70} container direction={'column'} alignItems={'center'} justifyContent={'center'}
+                                size={{
+                                    sm: 6,
+                                    md: 6,
+                                    xs: 12
+                                }}
+                            >
                                 <MultiSelect id="menu-categories" items={categoriesNames} label='Categories' onChange={handleCategoriesSelect}
-                                    error={!!errors.category} helperText={errors.category}
+                                    error={!!errors.category && edited} helperText={edited ? errors.category : ''}
                                     preSelected={selectedCategories}
                                 />
                             </Grid2>
-                            <Grid2 container direction={'column'} alignItems={'center'} justifyContent={'center'} size={4}>
+                            <Grid2 container direction={'column'} alignItems={'center'} justifyContent={'center'}
+
+                                size={{
+                                    sm: 2,
+                                    md: 2,
+                                    xs: 12
+                                }}
+
+                            >
                                 <Button size='small' variant='contained' onClick={handleSubmit}>Save</Button>
                             </Grid2>
                         </Grid2>
-                        <Typography variant='caption' color='error'>{errors.items}</Typography>
-                        <Grid2 container size={12} justifyContent={'space-between'}>
-                            <CategoryWiseItems onRecipeSelection={handleRecipeSelect} preSelectedRecipes={formData.items} selectedCategories={formData.categories} />
+                        <Grid2 direction={'column'} container size={12} justifyContent={'space-between'}>
+                            <Grid2 size={12} container justifyContent={'start'}>
+                                <Tabs
+                                    value={curCategory} onChange={handleCategoryTabChange} >
+                                    {categories.filter(c => formData.categories.includes(c.id)).map((item, index) => {
+                                        return <Tab key={item.id + index} label={item.name} />
+                                    })}
+                                </Tabs>
+                            </Grid2>
+                            <CategoryWiseItems
+                                key={curCategory}
+                                selectedCategory={formData.categories[curCategory]}
+                                onRecipeSelection={handleRecipeSelect} preSelectedRecipes={formData.items} selectedCategories={formData.categories} />
                         </Grid2>
                     </Grid2>
                 </>

@@ -4,6 +4,7 @@ import authApi, { AuthPayload } from "../../api"
 import useNotification from "../../hooks/useNotification"
 import { useNavigate } from "react-router"
 import axios from "axios"
+import { LinearProgress } from "@mui/material"
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
 
@@ -83,10 +84,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
 
     }, [ notifyError, navigate])
 
-    const content = isLoading ? <>Please wait...</> : props.children
     
     return <authContext.Provider value={{ data: {isLoading,isLoggedIn,authUser}, login, logout }}>
-        {content}
+        {isLoading && <LinearProgress/>}
+        {props.children}
     </authContext.Provider>
 
 }

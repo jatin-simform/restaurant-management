@@ -43,7 +43,7 @@ const CategoryForm: React.FC<{ category: ICategory, onSave: (data: ICategory) =>
                 />
             </DialogContent>
             <DialogActions>
-                <Button variant='contained' size="small" color="primary" onClick={handleSaveClick}>{curCategory.id ? "Edit" : "Add"}</Button>
+                <Button variant='contained' size="small" color="primary" onClick={handleSaveClick}>{curCategory.id ? "Update" : "Save"}</Button>
             </DialogActions>
         </Dialog>
     </>

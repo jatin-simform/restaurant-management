@@ -19,7 +19,7 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
     const navigate = useNavigate();
 
     const { isLoaded, menu: items } = useSelector((state: RootState) => state.menu);
-    const { notifyError } = useNotification();
+    const { notifyError,notifySuccess } = useNotification();
     //this is to load the initial data from the api
     useEffect(() => {
 
@@ -59,7 +59,8 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
             if (res.status !== 201) throw new Error("Failed to add new menu");
 
             dispatch(addMenu(newMenu));
-            navigate(`/menus/${id}`);
+            navigate(`/menus`);
+            notifySuccess("Data is saved successfully")
 
         } catch (e: unknown) {
 
@@ -73,7 +74,7 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
 
         return id;
 
-    }, [navigate]);
+    }, [navigate,notifySuccess]);
 
     const _delete = useCallback(async (id: string) => {
 
@@ -85,6 +86,7 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
             }
             //todo make API call
             dispatch(deleteMenu(id));
+            notifySuccess("Record is Deleted")
 
         } catch (e: unknown) {
 
@@ -99,7 +101,7 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
         return id;
 
 
-    }, []);
+    }, [notifySuccess,notifyError]);
 
     const update = useCallback(async (data: IMenu) => {
 
@@ -109,6 +111,7 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
             if(res.status!==200)throw new Error("Failed to update menu");
             dispatch(updateMenu(data))
             navigate(`/menus/`);
+            notifySuccess("Data is updated successfully")
 
         } catch (e: unknown) {
 
@@ -122,7 +125,7 @@ const MenuProvider: React.FC<{ children: React.ReactElement }> = ({ children }) 
 
         return data.id;
 
-    }, [dispatch,navigate]);
+    }, [dispatch,navigate,notifySuccess,notifyError]);
 
 
     return <menuContext.Provider value={{ isLoaded, items, add, delete: _delete, update, isLoading }}>

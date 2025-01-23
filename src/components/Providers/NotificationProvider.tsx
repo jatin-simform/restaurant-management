@@ -10,7 +10,13 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const notifySuccess = useCallback((message: string) => {
 
-        enqueueSnackbar(message, { variant: 'success' });
+        enqueueSnackbar(message, {
+            variant: 'success',
+            anchorOrigin: {
+                horizontal: 'center',
+                vertical: 'top'
+            }
+        });
 
     }, [enqueueSnackbar])
 
@@ -18,7 +24,13 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         console.log("its called", message)
 
-        enqueueSnackbar(message, { variant: 'error' });
+        enqueueSnackbar(message, {
+            variant: 'error',
+            anchorOrigin: {
+                horizontal: 'center',
+                vertical: 'top'
+            }
+        });
 
     }, [enqueueSnackbar])
 

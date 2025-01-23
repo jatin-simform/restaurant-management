@@ -1,139 +1,93 @@
-import { Avatar, Button, Checkbox, Grid2, List, ListItem, ListItemAvatar, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { Checkbox, Grid2 } from "@mui/material";
 import useCategories from "../../hooks/useCategories";
-import { ChangeEvent, Fragment, useCallback, useState } from "react";
+import { ChangeEvent, useCallback, useState } from "react";
 import useRecipes from "../../hooks/useRecipes";
-import { useNavigate } from "react-router";
-import { IRecipe } from "../../types";
+import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import EmptyState from "../EmptyState";
 
 interface ICategoryWiseItemsProps {
     selectedCategories: string[];
     onRecipeSelection: (ids: string[]) => void;
     preSelectedRecipes: string[];
+    selectedCategory: string;
 }
 
-const getCategoryItems = (categoryID: string, recipes: IRecipe[]) => {
-
-    return recipes.filter(t => categoryID===t.categoryID);
-
-}
-
-const CategoryWiseItems: React.FC<ICategoryWiseItemsProps> = ({ selectedCategories,onRecipeSelection,preSelectedRecipes }) => {
+const CategoryWiseItems: React.FC<ICategoryWiseItemsProps> = ({ selectedCategory, onRecipeSelection, preSelectedRecipes }) => {
 
     const { items: categories } = useCategories();
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
-    const [selectedRecipes, setSelectedRecipes] = useState<string[]>(preSelectedRecipes);
     const { items: recipes } = useRecipes();
-    const navigate = useNavigate();
+    const [selectionModel, setSelectionModel] = useState<string[]>(preSelectedRecipes);
+    const tableItems = recipes.filter((r) => selectedCategory === r.categoryID);
 
-    const handleRecipeEdit = useCallback((id: string) => {
-
-        navigate(`/recipes/${id}`);
-
-    }, [navigate]);
-
-    const handleSelectCategory = useCallback((id: string) => {
-
-        setSelectedCategory(id);
-
-    }, []);
-
-    const handleSelectAllRecipes = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-
-        const { checked } = e.target;
-        if (!checked) {
-            setSelectedRecipes([]);
-            onRecipeSelection([])
-            return;
+    const handleSelectRow = useCallback((e: ChangeEvent<HTMLInputElement>, rowId: string) => {
+        let updatedSelection: string[];
+        if (e.target.checked) {
+            updatedSelection = [...selectionModel, rowId];
+        } else {
+            updatedSelection = selectionModel.filter((id) => id !== rowId);
         }
+        onRecipeSelection(updatedSelection);
+        setSelectionModel(updatedSelection);
+    }, [selectionModel,onRecipeSelection]);
 
-        let ids = recipes.filter(t => t.categoryID === selectedCategory).map(t => t.id);
-        setSelectedRecipes(ids);
-        onRecipeSelection(ids)
+    const columns = [
+        {
+            field: "id",
+            renderHeader: () => (null),
+            renderCell: (params: GridRenderCellParams) => (
+                <Checkbox
+                    checked={selectionModel.includes(params.row.id)}
+                    onChange={(e) => handleSelectRow(e, params.row.id)}
+                />
+            ),
+            width: 50,
+            sortable: false,
+        },
+        {
+            field: "image",
+            headerName: "Image",
+            width: 150,
+            renderCell: (params: GridRenderCellParams) => (
+                <img src={params.value} alt={params.row.name} style={{ width: 50, height: 50 }} />
+            ),
+            sortable: false,
+        },
+        { field: "name", headerName: "Name", width: 180 },
+        { field: "description", headerName: "Description", width: 250 },
+        { field: "price", headerName: "Price ($)", width: 120 },
+        { field: "qty", headerName: "Quantity", width: 120 },
+        {
+            field: "categoryID",
+            headerName: "Category",
+            width: 150,
+            renderCell: (params: GridRenderCellParams) => {
+                const res = categories.find((t) => t.id === params.row.categoryID);
+                return res ? <>{res.name}</> : <></>;
+            },
+            sortable: false,
+        },
+    ];
 
+    if (tableItems.length === 0) {
+        return (
+            <Grid2 size={12} marginTop={2} container justifyContent="center">
+                <EmptyState />
+            </Grid2>
+        );
+    }
 
-    }, [selectedCategory, recipes, categories,onRecipeSelection]);
-
-    const handleRecipeSelection = useCallback((id: string) => {
-
-        if (selectedRecipes.includes(id)) {
-            let selectedIds=selectedRecipes.filter(t => t !== id);
-
-            setSelectedRecipes(selectedIds);
-
-            onRecipeSelection(selectedIds);
-            return;
-        }
-
-        setSelectedRecipes([...selectedRecipes, id]);
-        onRecipeSelection([...selectedRecipes, id]);
-
-
-    }, [selectedRecipes, onRecipeSelection]);
-
-    return <>
-        <Grid2 size={6} >
-            <Paper style={{ width: "100%", height: '60vh', overflowY: 'auto' }}>
-                {
-                    <List>
-                        {
-                            categories.filter(t => selectedCategories.includes(t.id)).map((t) => {
-                                return <>
-                                    <ListItem component={Button}
-                                        color={selectedCategory === t.id ? 'primary' : 'secondary'}
-                                        onClick={() => handleSelectCategory(t.id)}
-                                        key={t.id}>
-                                        <Typography fontWeight={selectedCategory === t.id ? '900' : '500'} >{t.name} ( {getCategoryItems(t.id,recipes).length} )</Typography>
-                                    </ListItem>
-                                </>
-                            })
-                        }
-                    </List>
-                }
-            </Paper>
-        </Grid2>
-        <Grid2 size={6} >
-            <Paper style={{ width: "100%", height: '60vh', overflowY: 'auto' }}>
-                {
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>
-                                    <Checkbox onChange={handleSelectAllRecipes} />
-                                </TableCell>
-                                <TableCell>Image</TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell>Price</TableCell>
-                                <TableCell>Qty</TableCell>
-                                <TableCell>Action</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {
-                                getCategoryItems(selectedCategory,recipes).map((t) => {
-                                    return <Fragment key={t.id}>
-                                        <TableRow>
-                                            <TableCell>
-                                                <Checkbox checked={selectedRecipes.includes(t.id)} onChange={() => handleRecipeSelection(t.id)} />
-                                            </TableCell>
-                                            <TableCell><Avatar src={t.image} /></TableCell>
-                                            <TableCell>{t.name}</TableCell>
-                                            <TableCell>{t.price}</TableCell>
-                                            <TableCell>{t.qty}</TableCell>
-                                            <TableCell>
-                                                <Button onClick={() => { handleRecipeEdit(t.id) }}>Edit</Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    </Fragment>
-                                })
-                            }
-                        </TableBody>
-                    </Table>
-                }
-            </Paper>
-        </Grid2>
-
-    </>
-
-}
+    return (
+        <>
+            <Grid2 size={12}>
+                <DataGrid
+                    rows={tableItems}
+                    columns={columns}
+                    disableColumnMenu
+                    disableRowSelectionOnClick
+                />
+            </Grid2>
+        </>
+    );
+};
 
 export default CategoryWiseItems;

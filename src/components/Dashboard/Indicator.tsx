@@ -1,18 +1,31 @@
-import { Grid2, Paper, Typography } from "@mui/material"
+import { Grid2, Typography } from "@mui/material"
 
 
 export interface IIndicatorProps {
     text: string,
-    count: number
+    count: number,
+    icon: React.ReactElement
 }
 
-const Indicator: React.FC<IIndicatorProps> = ({ count, text }) => {
+const Indicator: React.FC<IIndicatorProps> = ({ count, text ,icon}) => {
 
-    return <Grid2 size={{ xs: 12, sm: 4 }}>
-        <Paper style={{ width: '100%', height: 150 }} elevation={12} >
-            <Typography variant="h1" align="center" fontSize={50} fontWeight={900} > {text}</Typography>
-            <Typography variant="h2" align='center' fontSize={40}>{count}</Typography>
-        </Paper>
+    return <Grid2 size={{ xs: 12, sm: 12 ,md:4}}>
+        <div className="indicator-container">
+            <Grid2 container justifyContent='space-around' alignItems="center">
+                <Grid2 padding={2} size={6} >
+                    <Typography variant="h1" align="center" color="#fff" fontSize={50} fontWeight={900} > {count}</Typography>
+                    <Typography variant="h5" align='center' color="#fff" >{text}</Typography>
+                </Grid2>
+                <Grid2 size={6}>
+                    <div className="indicator">
+                        <div>
+                            {icon}
+                        </div>
+                    </div>
+                </Grid2>
+            </Grid2>
+
+        </div>
     </Grid2>
 }
 

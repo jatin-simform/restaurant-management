@@ -1,4 +1,57 @@
 body {
-    padding:  0px;
+    padding: 0px;
     margin: 0px;
+}
+
+/**to work with indicators**/
+
+.indicator {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 5px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.indicator>div {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.indicator-container {
+    width: 100% !important;
+    height: 150px !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    background: linear-gradient(to right, #ea7a9a 0%, #fac7b6 100%) !important;
+}
+
+div[aria-label="Collapse menu"],div[aria-label="Expand menu"]{
+    margin-top: 5px !important;
+}
+
+/**updated mui theme classes**/
+
+.css-jhqx6t-MuiButtonBase-root-MuiListItemButton-root.Mui-selected:hover {
+    background-color: rgb(241 3 71 / 36%) !important;
+    color: #fff !important;
+}
+
+.css-jhqx6t-MuiButtonBase-root-MuiListItemButton-root.Mui-selected {
+    background-color: #f38fac !important;
+}
+
+/** pagination */
+
+.css-kmpua6-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected {
+    color: #ffffff !important; 
+    border: 1px solid rgba(237, 142, 169, 0.5);
+    background-color: rgb(237 142 169) !important;
 }

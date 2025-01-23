@@ -17,7 +17,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
     const { isLoaded, categories: items } = useSelector((state: RootState) => state.category);
 
-    const { notifyError } = useNotification();
+    const { notifyError ,notifySuccess} = useNotification();
     
     //this is to load the initial data from the api
     useEffect(() => {
@@ -58,6 +58,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
             const res = await API.addCategory(newCategory);
             if (res.status !== 201) throw new Error("Failed to create category")
             dispatch(addCategory(newCategory));
+            notifySuccess("Date is saved successfully!")
 
         } catch (e: unknown) {
 
@@ -71,7 +72,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
         return newCategory.id;
 
-    }, []);
+    }, [notifyError,notifySuccess]);
 
     const _delete = useCallback(async (id: string) => {
 
@@ -80,6 +81,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
             const res = await API.deleteCategory(id);
             if (res.status !== 200) throw new Error("Failed to delete category")
             dispatch(deleteCategory(id));
+            notifySuccess("Record is deleted successfully")
 
         } catch (e: unknown) {
 
@@ -94,7 +96,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
         return id;
 
 
-    }, []);
+    }, [notifyError,notifySuccess]);
 
     const update = useCallback(async (data: ICategory) => {
 
@@ -103,6 +105,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
             const res = await API.updateCategory(data);
             if (res.status !== 200) throw new Error("Failed to update category!")
             dispatch(updateCategory(data))
+            notifySuccess("Data is updated successfully")
 
         } catch (e: unknown) {
 
@@ -116,7 +119,7 @@ const CategoryProvider: React.FC<{ children: React.ReactElement }> = ({ children
 
         return data.id;
 
-    }, [dispatch]);
+    }, [dispatch,notifyError,notifySuccess]);
 
 
 

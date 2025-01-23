@@ -1,33 +1,95 @@
 import { Outlet, useNavigate } from "react-router"
-import Header from "./Header"
 import useAuth from "../../hooks/useAuth"
-import { useCallback, useMemo } from "react";
+import { useMemo, useState } from "react";
+import { AppProvider, DashboardLayout, Navigation } from "@toolpad/core";
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import { Category, Menu, Restaurant, Search } from '@mui/icons-material';
+import useAppRouter from "../../hooks/useAppRouter";
+import MainTheme from "../../Theme/MainTheme";
+import { type Session } from '@toolpad/core/AppProvider';
+import { Box } from "@mui/material";
+import AppTitle from "./AppTitle";
+import ToolbarActionsSearch from "./ToolbarActionsSearch";
+import Copyright from "./Copyright";
+
+const links: Navigation = [
+    {
+        segment: 'dashboard',
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+    },
+    {
+        segment: 'menus',
+        title: 'Menus',
+        icon: <Menu />,
+    },
+    {
+        segment: 'categories',
+        title: 'Categories',
+        icon: <Category />,
+    },
+    {
+        segment: 'recipes',
+        title: 'Recipes',
+        icon: <Restaurant />,
+    },
+    {
+        segment: 'search',
+        title: 'Search',
+        icon: <Search />,
+    }
+
+];
 
 const Layout: React.FC = () => {
 
-    const { data } = useAuth();
-    const navigate=useNavigate()
+    const router = useAppRouter(window.location.pathname);
+    const auth = useAuth()
+    const navigate=useNavigate();
+    const [session, setSession] = useState<Session | null>({
+        user: {
+            name: auth.data.authUser?.firstName + ' ' + auth.data.authUser?.lastName,
+            email: auth.data.authUser?.email,
+            image: 'https://avatars.githubusercontent.com/u/19550456',
+        },
+    });
 
-    const handleNavigation=useCallback((path:string)=>{
-        return ()=>{
-            navigate(path)
-        }
-    },[navigate])
+    const authentication = useMemo(() => {
+        return {
+            signIn: () => {
+                navigate("/login")
+            },
+            signOut: () => {
+                auth.logout();
+                setSession(null);
+            },
+        };
+    }, [auth,navigate]);
 
-    const links=useMemo(()=>{
-
-        return [
-            { action: handleNavigation("/"), name: "Dashboard" },
-            { action:handleNavigation("/categories"), name: "Categories" },
-            { action: handleNavigation("/menus"), name: "Menus" },
-            { action:handleNavigation("/recipes"), name: "Recipes" },
-            { action:handleNavigation("/search"), name: "Search" },
-        ]
-    },[handleNavigation])
 
     return <>
-        <Header links={links} title="Take It Cheesy" user={data.authUser} />
-        <Outlet />
+        <AppProvider
+
+            session={session}
+            navigation={links}
+            authentication={authentication}
+            router={router}
+            theme={MainTheme}
+            branding={{ logo: <img src='https://sego.dexignzone.com/php/demo/assets/images/logo.png' />, title: 'Sego' }}
+        >
+            <DashboardLayout
+                slots={{
+                    toolbarActions: ToolbarActionsSearch,
+                    appTitle: AppTitle,
+                    sidebarFooter: Copyright,
+                }}
+            >
+                <Box padding={2}>
+                    <Outlet />
+                </Box>
+            </DashboardLayout>
+        </AppProvider >
+
     </>
 
 }

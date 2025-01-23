@@ -53,8 +53,7 @@ const MultiSelect: React.FC<IMultiSelect> = ({ items, label, id, onChange,error,
   }, [onChange, items]);
 
   return (
-    <div>
-      <FormControl sx={{ m: 1, width: 300 }} error={error}>
+      <FormControl sx={{ m: 1}} error={error} fullWidth>
         <InputLabel id={"label-id" + id}>{label}</InputLabel>
         <Select
           error={error}
@@ -87,7 +86,6 @@ const MultiSelect: React.FC<IMultiSelect> = ({ items, label, id, onChange,error,
         </Select>
         <Typography variant="caption" color="error">{helperText}</Typography>
       </FormControl>
-    </div>
   );
 
 }
